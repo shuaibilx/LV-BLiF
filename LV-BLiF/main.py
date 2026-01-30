@@ -1,6 +1,3 @@
-# ===================================================================
-#           main.py (修改为Epoch-based Control)
-# ===================================================================
 import sys
 import torch
 import torch.nn as nn
@@ -16,27 +13,17 @@ import h5py
 from tqdm import tqdm
 from collections import defaultdict
 from omegaconf import OmegaConf
-
-# --- [REMOVED] ---
-# from itertools import cycle # 不再需要
-
 from args import parse_args
 from dataset import LFIQADataset
 from model import QualityAssessmentModel
-# --- [MODIFIED] ---
-from engine import train_one_step, evaluate_on_test_set  # evaluate_on_test_set的调用方式会改变
+from engine import train_one_step, evaluate_on_test_set  
 from utils import setup_logging, set_seed, save_best_checkpoint, plot_loss_curves, LFIQA_collate_fn
 from data_splits import get_split_for_fold
 
 logger = logging.getLogger(__name__)
 
 
-# --- [REMOVED] ---
-# InfiniteDataLoader 类不再需要，因为我们使用标准的epoch-based循环
-# class InfiniteDataLoader: ...
-
 def discover_h5_files_and_map_to_scenes(h5_dir: str) -> dict:
-    # ... 此函数保持不变 ...
     if not os.path.isdir(h5_dir):
         raise FileNotFoundError(f"H5 dataset directory not found at: {h5_dir}")
     scene_to_h5_list_map = defaultdict(list)
@@ -74,8 +61,6 @@ def main(cfg):
     device = torch.device(cfg.device if torch.cuda.is_available() else "cpu")
     logger.info(
         f"--- Starting {cfg.cross_validation.num_folds}-Fold Cross-Validation for Dataset: {cfg.active_dataset} ---")
-    # --- [MODIFIED] ---
-    # 更新日志信息，显示总Epochs
     logger.info(
         f"Device: {device}, Total Train Epochs: {cfg.epochs}")
 
@@ -106,16 +91,11 @@ def main(cfg):
         model = QualityAssessmentModel(cfg).to(device)
 
         if cfg.differential_lr.enabled:
-            # (您的差分学习率代码保持不变)
             pass
         else:
             optimizer = optim.AdamW(model.parameters(), lr=cfg.learning_rate, weight_decay=cfg.weight_decay)
 
         criterion = nn.MSELoss().to(device)
-
-        # --- [MODIFIED] ---
-        # 学习率调度器的 T_max 需要基于新的训练流程重新计算
-        # T_max 是总的更新步数 = 每个epoch的步数 * 总epoch数
         steps_per_epoch = len(train_loader)
         total_train_steps_for_scheduler = steps_per_epoch * cfg.epochs
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer, T_max=total_train_steps_for_scheduler,
@@ -125,43 +105,29 @@ def main(cfg):
         scaler = GradScaler(enabled=(device.type == "cuda"))
         best_composite_metric_for_fold = -float('inf')
         best_metrics_for_fold = {}
-        # --- [MODIFIED] ---
-        # 记录每个epoch的平均训练损失和验证损失
         train_losses_per_epoch = []
         val_maes_per_epoch = []
 
-        # --- 【【【核心修改】】】 ---
-        # 主训练循环从基于step改为基于epoch
         for epoch in range(1, cfg.epochs + 1):
-            model.train()  # 确保在每个epoch开始时模型处于训练模式
+            model.train() 
             epoch_train_losses = []
-
-            # 使用tqdm包装train_loader以显示每个epoch内的进度
             progress_bar = tqdm(train_loader, desc=f"Fold {fold} Epoch {epoch}/{cfg.epochs} [Training]",
                                 file=sys.stdout)
 
             for batch in progress_bar:
-                # train_one_step 函数处理一个批次的数据
                 total_loss, mos_loss, _, _ = train_one_step(model, batch, criterion, optimizer, device, cfg, scaler)
 
                 epoch_train_losses.append(mos_loss)
-
-                # 更新进度条的后缀信息
                 progress_bar.set_postfix(
                     avg_loss=f"{np.mean(epoch_train_losses):.4f}",
                     lr=f"{optimizer.param_groups[0]['lr']:.1e}"
                 )
-
-                # 学习率调度器在每个step后更新
                 if scheduler:
                     scheduler.step()
 
-            # --- 一个epoch的训练结束后 ---
             avg_epoch_train_loss = np.mean(epoch_train_losses)
             train_losses_per_epoch.append(avg_epoch_train_loss)
             logger.info(f"Fold {fold} Epoch {epoch} - Average Training MOS Loss: {avg_epoch_train_loss:.4f}")
-
-            # --- 在每个epoch后进行评估 ---
             eval_loss, test_metrics = evaluate_on_test_set(
                 model, test_loader, device, cfg, epoch_num=epoch
             )
@@ -173,7 +139,6 @@ def main(cfg):
                 f"RMSE = {test_metrics['rmse']:.4f}, MAE = {test_metrics['mae']:.4f} ---"
             )
 
-            # --- 根据评估结果保存最佳模型 ---
             current_composite_metric = (test_metrics.get('plcc', -1) + test_metrics.get('srcc', -1)) / 2.0
             if current_composite_metric > best_composite_metric_for_fold:
                 best_composite_metric_for_fold = current_composite_metric
@@ -181,15 +146,15 @@ def main(cfg):
                 fold_output_dir = os.path.join(output_dir, f"fold_{fold}")
 
                 save_best_checkpoint({
-                    'epoch': epoch,  # 保存 epoch 而不是 step
+                    'epoch': epoch,  
                     'state_dict': model.state_dict(),
                     'best_composite_metric': best_composite_metric_for_fold,
                     'test_metrics_at_best': best_metrics_for_fold,
-                    'optimizer_state_dict': optimizer.state_dict(),  # 建议保存优化器状态
+                    'optimizer_state_dict': optimizer.state_dict(),  
                     'config': OmegaConf.to_container(cfg, resolve=True)
                 }, output_dir=fold_output_dir)
 
-        # --- 整个Fold的训练循环结束后 ---
+
         if train_losses_per_epoch and val_maes_per_epoch:
             fold_output_dir = os.path.join(output_dir, f"fold_{fold}")
             plot_filename = f"loss_curves_fold_{fold}_epochs.png"
@@ -199,7 +164,7 @@ def main(cfg):
                 output_dir=fold_output_dir,
                 filename=plot_filename,
                 title=f"Loss Curves for Fold {fold} on {cfg.active_dataset}",
-                x_label_train="Epochs",  # X轴现在是Epochs
+                x_label_train="Epochs",  
                 x_label_val="Epochs"
             )
 
@@ -207,7 +172,6 @@ def main(cfg):
             f"*** Fold {fold} Best Metrics: PLCC={best_metrics_for_fold.get('plcc', -1):.4f}, SRCC={best_metrics_for_fold.get('srcc', -1):.4f} ***")
         all_folds_metrics.append(best_metrics_for_fold)
 
-    # --- 报告最终的交叉验证结果 (逻辑不变) ---
     logger.info(f"\n{'=' * 25} CROSS-VALIDATION SUMMARY FOR {cfg.active_dataset} {'=' * 25}")
     if all_folds_metrics:
         metrics_df = pd.DataFrame(all_folds_metrics)
@@ -227,4 +191,5 @@ def main(cfg):
 
 if __name__ == '__main__':
     config_from_args = parse_args()
+
     main(config_from_args)
