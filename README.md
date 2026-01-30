@@ -1,4 +1,6 @@
-### LV-BLiF
+* * *
+
+LV-BLiF
 
 This repository provides the official implementation of **LV-BLiF**, a no-reference light field image quality assessment (NR-LFIQA) framework based on **language–vision representation learning**.
 
@@ -44,7 +46,7 @@ Please create a virtual environment and install dependencies via: pip install -r
 
 The light field datasets preprocessed using MATLAB are provided via Quark NetDisk:
 
-* **MATLAB-processed datasets**:[夸克网盘分享](https://pan.quark.cn/s/9b8361eb5785)
+* **MATLAB-processed datasets**:[Download](https://pan.quark.cn/s/9b8361eb5785)
 
 After downloading, please organize the dataset according to the structure expected by `dataset.py`.
 
@@ -54,7 +56,7 @@ After downloading, please organize the dataset according to the structure expect
 
 To reduce computational cost and improve reproducibility, semantic features extracted by **mPLUG-Owl2** are provided offline:
 
-* **Pre-extracted semantic features**:[夸克网盘分享](https://pan.quark.cn/s/49e6e75d9321)
+* **Pre-extracted semantic features**:[Download](https://pan.quark.cn/s/49e6e75d9321)
 
 Please place the downloaded semantic feature files into the following directory: LV-BLiF/data/
 
