@@ -1,0 +1,101 @@
+seed: 42
+device: 'cuda'
+log_dir: './Basic_metrics/logs/'
+output_dir: './Basic_metrics/outputs/'
+
+
+lmm_feature_dir: './data/lmm_features/'
+
+
+epochs: 10
+batch_size: 8 # yuanben 8
+learning_rate: 0.00008     # original : 0.0005
+weight_decay: 0.2      # original ： 一般是 0.01 - 0.1
+num_workers: 1
+
+lr_scheduler:
+  enabled: true
+  name: "CosineAnnealingLR"
+  T_max: 10      # CosineAnnealingLR 的 T_max, 通常设为总 epochs
+  eta_min: 0.000001 # 学习率的最小值 (1e-6)
+
+cross_validation:
+  num_folds: 5
+
+w_main: 1.0
+w_spa_aux: 0.1
+w_ang_aux: 0.1
+w_mse: 1   # original: 0.8
+w_plcc: 0  # original: 0.2
+
+model:
+  aux_branch_dropout: 0.5   # 一般是0.2
+  ablation_switches:
+    use_semantic_branch: true
+    use_auxiliary_learning: true
+    # --- FiLM层开关 ---
+    # 控制是否使用FiLM层来调制视觉分支。
+    use_film_layer: true
+grad_clip_norm: 1.0
+lmm_feature_dim: 4096
+aux_hidden_dim: 2048
+
+visual_branch_config:
+  enabled: true # 设置为 true 以启用新的解耦视觉支路
+  # 这些参数控制了 DisentgBlock 的结构
+  patch_size: 64          # Patch大小
+  angRes: 9               # 角度分辨率
+  resnet_version: 'resnet18'  # 切换 'resnet18' 或 'resnet34'
+  channels: 32            # 特征图的通道数
+  n_group: 1              # CascadeDisentgGroup 中的组数
+  n_block: 1              # 每个 DisentgGroup 中的块数
+  dropout_visual_head: 0.2 # 回归头的dropout率
+
+cross_attn:
+  num_heads: 8         # aux_hidden_dim (2048) 必须能被整除
+  dropout: 0.2
+
+mos_min_overall: 1.0
+mos_max_overall: 5.0
+
+apply_logistic_fitting_on_eval: true  # 设置为 true 以启用, false 以禁用
+
+differential_lr:
+  enabled: false
+  pretrained_lr_factor: 0.1
+
+
+label_smoothing:
+  enabled: false
+  alpha: 0.1
+
+
+
+# mPLUG-Owl2 相关配置 (用于 get_lmm_features.py)
+mplug_model_path: "MAGAer13/mplug-owl2-llama2-7b"
+mplug_model_base: null
+mplug_device: "cuda"
+mplug_conv_mode: "mplug_owl2"
+mplug_load_8bit: false
+mplug_load_4bit: false
+overwrite_features: false
+
+# --- 数据集列表 & 配置 ---
+# all_dataset_keys 不再用于交叉验证的 test_dataset 选择，而是用于 get_lmm_features.py 遍历
+all_dataset_keys_for_feature_extraction: ["NBU", "Win5LID", "SHU"] # 用于语义特征提取脚本
+
+
+datasets:
+  NBU:
+    h5_dataset_dir: 'E:\AAAlxlxx\Datasets\new_h5_all\nbu_h5_all\' # 使用实际路径
+    lmm_feature_subdir: 'NBU' # 用于 lmm_feature_dir 下的子目录名
+
+  Win5LID:
+    h5_dataset_dir: 'E:\AAAlxlxx\Datasets\new_h5_all\win5-lid\' # 使用实际路径
+    lmm_feature_subdir: 'Win5LID'
+
+  SHU:
+    h5_dataset_dir: 'E:\AAAlxlxx\Datasets\new_h5_all\shu/' # 使用实际路径
+    lmm_feature_subdir: 'SHU'
+
+

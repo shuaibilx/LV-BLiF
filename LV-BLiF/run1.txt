@@ -1,0 +1,13 @@
+# Extract semantic features
+python get_lmm_features.py --config configs/combined.yaml
+
+#Train and test
+python main.py --config <config_file_path> --active_dataset <dataset_name>
+python main.py --config configs/combined.yaml --active_dataset NBU
+python main.py --config configs/combined.yaml --active_dataset Win5LID
+python main.py --config configs/combined.yaml --active_dataset SHU
+
+
+
+
+
