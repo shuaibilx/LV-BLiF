@@ -42,7 +42,7 @@ Please create a virtual environment and install dependencies via: pip install -r
 
 * * *
 
-### 3.1 MATLAB-Processed Datasets
+#### 3.1 MATLAB-Processed Datasets
 
 The light field datasets preprocessed using MATLAB are provided via Quark NetDisk:
 
@@ -52,7 +52,7 @@ After downloading, please organize the dataset according to the structure expect
 
 * * *
 
-### 3.2 Pre-extracted Semantic Features (mPLUG-Owl2)
+#### 3.2 Pre-extracted Semantic Features (mPLUG-Owl2)
 
 To reduce computational cost and improve reproducibility, semantic features extracted by **mPLUG-Owl2** are provided offline:
 
@@ -72,15 +72,15 @@ All experiments are controlled by a unified configuration file: configs/combined
 
 You can run the model on different datasets using the following commands.
 
-### 4.1 NBU-LF1.0 Dataset
+#### 4.1 NBU-LF1.0 Dataset
 
     python main.py --config configs/combined.yaml --active_dataset NBU
 
-### 4.2 SHU Dataset
+#### 4.2 SHU Dataset
 
     python main.py --config configs/combined.yaml --active_dataset SHU
 
-### 4.3 Win5-LID Dataset
+#### 4.3 Win5-LID Dataset
 
     python main.py --config configs/combined.yaml --active_dataset Win5LID
 
