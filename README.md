@@ -1,6 +1,6 @@
 * * *
 
-##### LV-BLiF
+# LV-BLiF
 
 This repository provides the official implementation of **LV-BLiF**, a no-reference light field image quality assessment (NR-LFIQA) framework based on **language–vision representation learning**.
 
@@ -8,7 +8,7 @@ LV-BLiF integrates a **textual prompts–assisted semantic branch** with a **sub
 
 * * *
 
-#### 1. Environment Setup
+## 1. Environment Setup
 
 * * *
 
@@ -20,7 +20,7 @@ Please create a virtual environment and install dependencies via: pip install -r
 
 * * *
 
-#### 2. Code Structure
+## 2. Code Structure
 
 * * *
 
@@ -38,7 +38,7 @@ Please create a virtual environment and install dependencies via: pip install -r
 
 * * *
 
-#### 3. Data Preparation
+## 3. Data Preparation
 
 * * *
 
@@ -64,7 +64,7 @@ Please place the downloaded semantic feature files into the following directory:
 
 * * *
 
-#### 4. Running the Code
+## 4. Running the Code
 
 * * *
 
@@ -86,7 +86,7 @@ You can run the model on different datasets using the following commands.
 
 * * *
 
-#### 5. Citation
+## 5. Citation
 
 * * *
 
@@ -107,7 +107,7 @@ If this project or the provided resources are helpful to your research, please c
 
 * * *
 
-#### 6. Contact
+## 6. Contact
 
 * * *
 
