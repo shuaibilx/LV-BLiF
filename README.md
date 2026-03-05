@@ -91,7 +91,7 @@ You can run the model on different datasets using the following commands.
 * * *
 
 If this project or the provided resources are helpful to your research, please cite our paper:
-
+```bibtex
 > @ARTICLE{11420244,
   author={Liao, Xin and Chai, Xiongli and Chen, Hangwei and Jing, Weiyi and Shao, Feng and Jiang, Qiuping},
   journal={IEEE Transactions on Broadcasting}, 
@@ -102,7 +102,7 @@ If this project or the provided resources are helpful to your research, please c
   pages={1-15},
   keywords={Semantics;Visualization;Feature extraction;Quality assessment;Light fields;Vectors;Image quality;Representation learning;Adaptation models;Transformers;Light field images;image quality assessment;large multi-modality model;feature-wise linear modulation;semantic features},
   doi={10.1109/TBC.2026.3668512}}
-
+```
 
 
 * * *
