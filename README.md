@@ -1,4 +1,3 @@
-```markdown
 # LV-BLiF
 
 <div align="center">
@@ -34,7 +33,6 @@ cd LV-BLiF
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
 > 💡 **Note on Large Multimodal Model:**
 > The large multimodal model **mPLUG-Owl2** is **not trained online** in this project to save computational resources. Semantic features are **pre-extracted offline** and provided via cloud storage (see Section 3).
