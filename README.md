@@ -1,98 +1,113 @@
-* * *
-
+```markdown
 # LV-BLiF
 
-This repository provides the official implementation of **LV-BLiF**, a no-reference light field image quality assessment (NR-LFIQA) framework based on **language–vision representation learning**.
+<div align="center">
 
-LV-BLiF integrates a **textual prompts–assisted semantic branch** with a **subspace cues–assisted visual branch** to achieve content-aware and spatio-angular consistent quality assessment for light field images.
+<h3>LV-BLiF: Harnessing Language-Vision Representation Learning for Blind Light Field Image Quality Assessment</h3>
 
-* * *
+[![Paper](https://img.shields.io/badge/Journal-IEEE_TBC-blue.svg)](https://doi.org/10.1109/TBC.2026.3668512)
+[![DOI](https://img.shields.io/badge/DOI-10.1109%2FTBC.2026.3668512-darkred.svg)](https://doi.org/10.1109/TBC.2026.3668512)
+[![Dataset](https://img.shields.io/badge/Dataset-Quark_NetDisk-green.svg)](#3-data-preparation)
 
-## 1. Environment Setup
+*Official PyTorch Implementation for No-Reference Light Field Image Quality Assessment*
 
-* * *
+</div>
 
-All required Python dependencies are listed in `requirements.txt`.
+---
 
-Please create a virtual environment and install dependencies via: pip install -r requirements.txt
+## 📖 Introduction
 
-> **Note**The large multimodal model **mPLUG-Owl2** is **not trained online** in this project.Semantic features are **pre-extracted offline** and provided via cloud storage (see Section 3).
+This repository provides the official implementation of **LV-BLiF**, a no-reference light field image quality assessment (NR-LFIQA) framework based on **language–vision representation learning**. 
 
-* * *
+LV-BLiF elegantly integrates a **textual prompts-assisted semantic branch** with a **subspace cues-assisted visual branch** to achieve content-aware and spatio-angular consistent quality assessment for light field images.
 
-## 2. Code Structure
+---
 
-* * *
+## 🛠️ Environment Setup
 
-    LV-BLiF/
-    ├── configs/                  # Configuration files
-    │   └── combined.yaml
-    ├── data/                     # Pre-extracted semantic features
-    ├── mplug_owl2/               # mPLUG-Owl2 related code
-    ├── arg.py                    
-    ├── data_splits.py            
-    ├── dataset.py                
-    ├── metrics.py                
-    ├── utils.py                  
-    └── main.py                   
+All required Python dependencies are listed in the `requirements.txt` file. Please create a virtual environment and install the dependencies via:
 
-* * *
+```bash
+# Clone the repository
+git clone [https://github.com/shuaibilx/LV-BLiF.git](https://github.com/shuaibilx/LV-BLiF.git)
+cd LV-BLiF
 
-## 3. Data Preparation
+# Install dependencies
+pip install -r requirements.txt
+```
 
-* * *
+> 💡 **Note on Large Multimodal Model:**
+> The large multimodal model **mPLUG-Owl2** is **not trained online** in this project to save computational resources. Semantic features are **pre-extracted offline** and provided via cloud storage (see Section 3).
 
-#### 3.1 MATLAB-Processed Datasets
+---
 
+## 📂 Code Structure
+
+```text
+LV-BLiF/
+├── configs/                  # Configuration files
+│   └── combined.yaml
+├── data/                     # Pre-extracted semantic features (Need to be downloaded)
+├── mplug_owl2/               # mPLUG-Owl2 related code (for offline extraction)
+├── arg.py                    # Argument parser
+├── data_splits.py            # Dataset splitting logic
+├── dataset.py                # PyTorch Dataset definitions
+├── metrics.py                # Evaluation metrics (PLCC, SROCC, etc.)
+├── utils.py                  # Utility functions
+└── main.py                   # Main training and evaluation script
+```
+
+---
+
+## 📦 Data Preparation
+
+### 3.1 MATLAB-Processed Datasets
 The light field datasets preprocessed using MATLAB are provided via Quark NetDisk:
+- 📥 **[Download MATLAB-processed datasets](https://pan.quark.cn/s/9b8361eb5785)**
 
-* **MATLAB-processed datasets**:[Download](https://pan.quark.cn/s/9b8361eb5785)
+After downloading, please organize the dataset according to the directory structure expected by `dataset.py`.
 
-After downloading, please organize the dataset according to the structure expected by `dataset.py`.
+### 3.2 Pre-extracted Semantic Features (mPLUG-Owl2)
+To significantly reduce computational cost and improve reproducibility, semantic features extracted by **mPLUG-Owl2** are provided offline:
+- 📥 **[Download Pre-extracted semantic features](https://pan.quark.cn/s/49e6e75d9321)**
 
-* * *
+Please place the downloaded semantic feature files directly into the following directory:
+```bash
+LV-BLiF/data/
+```
 
-#### 3.2 Pre-extracted Semantic Features (mPLUG-Owl2)
+> ⚠️ **Important:**
+> mPLUG-Owl2 is **used only for offline feature extraction**. During the actual training and testing phases, LV-BLiF directly loads these pre-extracted semantic features from the `data/` folder.
 
-To reduce computational cost and improve reproducibility, semantic features extracted by **mPLUG-Owl2** are provided offline:
+---
 
-* **Pre-extracted semantic features**:[Download](https://pan.quark.cn/s/49e6e75d9321)
+## 🚀 Running the Code
 
-Please place the downloaded semantic feature files into the following directory: LV-BLiF/data/
+All experiments are controlled by a unified configuration file located at `configs/combined.yaml`. You can run the model on different datasets using the following commands:
 
-> **Important**mPLUG-Owl2 is **used only for offline feature extraction**.During training and testing, LV-BLiF directly loads these pre-extracted semantic features.
+### NBU-LF1.0 Dataset
+```bash
+python main.py --config configs/combined.yaml --active_dataset NBU
+```
 
-* * *
+### SHU Dataset
+```bash
+python main.py --config configs/combined.yaml --active_dataset SHU
+```
 
-## 4. Running the Code
+### Win5-LID Dataset
+```bash
+python main.py --config configs/combined.yaml --active_dataset Win5LID
+```
 
-* * *
+---
 
-All experiments are controlled by a unified configuration file: configs/combined.yaml
+## 📝 Citation
 
-You can run the model on different datasets using the following commands.
+If this project or the provided resources are helpful to your research, please cite our IEEE Transactions on Broadcasting paper:
 
-#### 4.1 NBU-LF1.0 Dataset
-
-    python main.py --config configs/combined.yaml --active_dataset NBU
-
-#### 4.2 SHU Dataset
-
-    python main.py --config configs/combined.yaml --active_dataset SHU
-
-#### 4.3 Win5-LID Dataset
-
-    python main.py --config configs/combined.yaml --active_dataset Win5LID
-
-* * *
-
-## 5. Citation
-
-* * *
-
-If this project or the provided resources are helpful to your research, please cite our paper:
 ```bibtex
-> @ARTICLE{11420244,
+@ARTICLE{11420244,
   author={Liao, Xin and Chai, Xiongli and Chen, Hangwei and Jing, Weiyi and Shao, Feng and Jiang, Qiuping},
   journal={IEEE Transactions on Broadcasting}, 
   title={LV-BLiF: Harnessing Language-Vision Representation Learning for Blind Light Field Image Quality Assessment}, 
@@ -100,19 +115,15 @@ If this project or the provided resources are helpful to your research, please c
   volume={},
   number={},
   pages={1-15},
-  keywords={Semantics;Visualization;Feature extraction;Quality assessment;Light fields;Vectors;Image quality;Representation learning;Adaptation models;Transformers;Light field images;image quality assessment;large multi-modality model;feature-wise linear modulation;semantic features},
-  doi={10.1109/TBC.2026.3668512}}
+  doi={10.1109/TBC.2026.3668512}
+}
 ```
 
+---
 
-* * *
-
-## 6. Contact
-
-* * *
+## 📧 Contact
 
 If you have any questions regarding the code, datasets, or implementation details, please feel free to contact:
 
-📧 **Email**: [2871474054@qq.com](mailto:2871474054@qq.com)
-
-* * *
+- **Email**: [2871474054@qq.com](mailto:2871474054@qq.com)
+```
